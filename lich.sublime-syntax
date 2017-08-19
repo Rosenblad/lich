@@ -1,0 +1,81 @@
+%YAML 1.2
+---
+name: lich
+file_extensions: [lich]
+scope: source.lich
+uuid: 26b815a9-cbbf-46f2-b1c6-9452a7102f4a
+
+variables:
+  ident: '[_$a-zA-Z][$\w]*'
+
+contexts:
+  main:
+    - match: '"'
+      push: string
+    - match: '[//|#]'
+      push: comment
+    - match: (^|\t)-
+      push: listitem
+    - match: ^__[^_]+
+      push: bold
+    - match: https?:\/\/[a-z]+\.[a-z]+(\.[a-z]+)?\/?([a-z0-9\/\-#]+)?
+      push: link
+    - match: /[0-9]{2}:[0-9]{2}
+      push: time
+    - match: ^(RUN|CMD|ADD|MAINTAINER|FROM|COPY)
+      scope: keyword.docker.savvy
+
+  pre-semi:
+    - match: '([A-Z][a-z]+):{1}\s\w'
+      captures:
+        1: meta.key.savvy
+
+  list-parent:
+    - match: (.*):\n
+      scope: keyword.list.list-parent.savvy
+
+  command:
+    - match: '\b([\w]+)\b[ \t]{2}'
+      scope: keyword.command.savvy
+
+  string:
+    - meta_scope: string.quoted.double.savvy
+    
+    - match: /\.
+      scope: constant.character.escape.savvy
+    
+    - match: '"'
+      pop: true
+
+  comment:
+    - include: command
+    - include: list-parent
+    - include: pre-semi
+    - meta_scope: comment.savvy
+    - match: $
+      pop: true
+
+  command_dir:
+    - meta_scope: keyword.command.savvy
+    - match: '[ \t]{2}|$'
+      pop: true
+
+  listitem:
+    - meta_scope: keyword.operator.listitem.savvy
+    - match: \s
+      pop: true
+
+  bold:
+    - meta_scope: keyword.operator.bold.savvy
+    - match: __
+      pop: true
+
+  link:
+    - meta_scope: keyword.operator.link.savvy
+    - match: \b
+      pop: true
+
+  time:
+    - meta_scope: keyword.operator.time.savvy
+    - match: \b
+      pop: true
