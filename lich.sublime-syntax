@@ -12,6 +12,16 @@ contexts:
     - include: url
     - include: title
     - include: docker
+    - include: comment
+    - include: date
+
+  date:
+    - match: '[0-9]{2}\/[0-9]{2}'
+      scope: entity.date.lich
+
+  comment:
+    - match: '\s+#\s.*'
+      scope: comment.lich
 
   command: # not included
     - match: '\b([\w]+)\b[ \t]{2}'
